@@ -1,12 +1,36 @@
 #
-# Makefile for your PHP extension
+#	Makefile template
 #
-# This Makefile is designed to help you build and install your PHP extension
-# on XAMPP with PHP version 8.2 on Arch Linux.
+#	This is an example Makefile that can be used by anyone who is building
+#	his or her own PHP extensions using the PHP-CPP library. 
+#
+#	In the top part of this file we have included variables that can be
+#	altered to fit your configuration, near the bottom the instructions and
+#	dependencies for the compiler are defined. The deeper you get into this
+#	file, the less likely it is that you will have to change anything in it.
 #
 
-# Name of your extension
-NAME = yourextension
+#
+#	Name of your extension
+#
+#	This is the name of your extension. Based on this extension name, the
+#	name of the library file (name.so) and the name of the config file (name.ini)
+#	are automatically generated
+#
+
+NAME				=yourextension
+
+
+#
+#	Php.ini directories
+#
+#	In the past, PHP used a single php.ini configuration file. Today, most
+#	PHP installations use a conf.d directory that holds a set of config files,
+#	one for each extension. Use this variable to specify this directory.
+#
+
+INI_DIR				=	/etc/php82/conf.d
+
 
 #
 #	The extension dirs
@@ -17,18 +41,18 @@ NAME = yourextension
 #	this with a different fixed directory
 #
 
-EXTENSION_DIR		=	$(shell /opt/lampp/bin/php-config --extension-dir)
+EXTENSION_DIR		=	$(shell php-config82 --extension-dir)
 
-# TODO: add line extension=yourextension.so to /opt/lampp/etc/php.ini
 
 #
-#	The name of the extension
+#	The name of the extension and the name of the .ini file
 #
 #	These two variables are based on the name of the extension. We simply add
 #	a certain extension to them (.so or .ini)
 #
 
 EXTENSION 			=	${NAME}.so
+INI 				=	${NAME}.ini
 
 #
 #	Compiler
@@ -72,6 +96,7 @@ LINKER_DEPENDENCIES	=	-lphpcpp
 
 RM					=	rm -f
 CP					=	cp -f
+MKDIR				=	mkdir -p
 
 #
 #	All source files are simply all *.cpp files found in the current directory
@@ -98,9 +123,16 @@ ${OBJECTS}:
 
 install:		
 						${CP} ${EXTENSION} ${EXTENSION_DIR}
-
+						${CP} ${INI} ${INI_DIR}			
 clean:
 						${RM} ${EXTENSION} ${OBJECTS}
 
 uninstall:
 						${RM} ${EXTENSION_DIR}/${EXTENSION}
+						${RM} ${INI_DIR}/${INI}
+
+test-cli:
+						php test.php
+
+test-web:
+						php -S localhost:8080
